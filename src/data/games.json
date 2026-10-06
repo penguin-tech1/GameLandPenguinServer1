@@ -343,6 +343,25 @@
     "isNew": true
   },
   {
+    "id": "soccer-retro-style",
+    "title": "Soccer Retro Style",
+    "slug": "soccer-retro-style",
+    "category": "Sports",
+    "description": "Retro-styled pixel soccer with quick matches, smooth controls, and classic arcade pressure.",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1547347298-4074fc3086f0?auto=format&fit=crop&q=80&w=600",
+    "embedUrl": "https://penguin-techhelp.github.io/SoccerRetroStyleGame/",
+    "embedType": "iframe",
+    "tags": ["sports", "soccer", "retro", "arcade", "football"],
+    "rating": 4.7,
+    "playCount": 0,
+    "controls": [
+      { "key": "Mouse / Touch", "action": "Aim & Kick" },
+      { "key": "Arrow Keys / WASD", "action": "Move Player" }
+    ],
+    "author": "Penguin Tech Help",
+    "isNew": true
+  },
+  {
     "id": "2048",
     "title": "2048 Arctic Edition",
     "slug": "2048",
