@@ -362,6 +362,25 @@
     "isNew": true
   },
   {
+    "id": "basketballretro",
+    "title": "Basketball Retro",
+    "slug": "basketballretro",
+    "category": "Sports",
+    "description": "Retro-inspired basketball arcade action with fast shooting, movement, and score chasing.",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1546519638-68711109bc00?auto=format&fit=crop&q=80&w=600",
+    "embedUrl": "https://penguin-techhelp.github.io/Basketballretro/",
+    "embedType": "iframe",
+    "tags": ["sports", "basketball", "retro", "arcade", "score"],
+    "rating": 4.7,
+    "playCount": 0,
+    "controls": [
+      { "key": "Mouse / Touch", "action": "Aim & Shoot" },
+      { "key": "Arrow Keys / WASD", "action": "Move Player" }
+    ],
+    "author": "Penguin Tech Help",
+    "isNew": true
+  },
+  {
     "id": "2048",
     "title": "2048 Arctic Edition",
     "slug": "2048",
