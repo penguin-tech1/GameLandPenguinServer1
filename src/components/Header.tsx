@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Search, PanelLeftClose, PanelLeftOpen, ShieldCheck, Mail, LogOut, Snowflake, Settings, Crown, Flame, ShoppingBag, Megaphone, WifiOff, RefreshCw, Sparkles } from 'lucide-react';
+import { Search, PanelLeftClose, PanelLeftOpen, ShieldCheck, Mail, LogOut, Snowflake, Settings, Crown, Flame, ShoppingBag, Megaphone } from 'lucide-react';
 import { FilterState } from '../types';
 import { UserAccount, getUserPoints } from '../utils/auth';
 import { PenguinMascot } from './PenguinMascot';
 import { getAvatarById } from '../utils/penguinAvatars';
 import { getGlobalAdminSettings, GlobalAdminSettings } from '../utils/adminVipPerks';
-import { PWAInstallButton } from './PWAInstallButton';
-import { useOnlineStatus } from '../hooks/useOnlineStatus';
-import { usePWAUpdate } from '../hooks/usePWAUpdate';
 
 interface HeaderProps {
   filterState: FilterState;
@@ -53,8 +50,6 @@ export const Header: React.FC<HeaderProps> = ({
   onSignOut,
 }) => {
   const userPoints = getUserPoints(currentUser);
-  const isOnline = useOnlineStatus();
-  const { isUpdateAvailable, isUpdating, applyUpdate } = usePWAUpdate();
   const [adminSettings, setAdminSettings] = useState<GlobalAdminSettings>(getGlobalAdminSettings());
 
   useEffect(() => {
@@ -181,34 +176,6 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="hidden sm:inline">Privacy</span>
             </button>
           )}
-
-          {/* Offline Mode Indicator Badge */}
-          {!isOnline && (
-            <div
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-black shadow-sm"
-              title="You are currently offline. Local built-in games and accounts are active."
-            >
-              <WifiOff className="w-3.5 h-3.5 text-amber-400" />
-              <span className="hidden sm:inline">Offline Mode</span>
-            </div>
-          )}
-
-          {/* PWA Update Button when Connected & Update Ready */}
-          {isUpdateAvailable && (
-            <button
-              onClick={applyUpdate}
-              disabled={isUpdating}
-              title="A newer version of the game portal is ready! Click to update now."
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-400 to-cyan-400 hover:from-sky-300 hover:to-cyan-300 text-slate-950 text-xs font-black shadow-lg shadow-sky-500/30 animate-pulse hover:animate-none transition cursor-pointer active:scale-95 disabled:opacity-50"
-              id="header-update-app-btn"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isUpdating ? 'animate-spin' : ''}`} />
-              <span className="hidden sm:inline">{isUpdating ? 'Updating...' : 'Update Game'}</span>
-            </button>
-          )}
-
-          {/* PWA Install Button for Offline Play */}
-          <PWAInstallButton />
 
           {/* Terms & Conditions Button */}
           {onOpenTerms && (

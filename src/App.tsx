@@ -37,9 +37,6 @@ import { recordFavoritesChange, evaluateTrophies } from './utils/trophies';
 import { PenguinMascot } from './components/PenguinMascot';
 import { SnowfallEffect } from './components/SnowfallEffect';
 import { PebblesCornerHub } from './components/PebblesCornerHub';
-import { OfflineIndicator } from './components/OfflineIndicator';
-import { PWAUpdateToast } from './components/PWAUpdateToast';
-import { useOnlineStatus } from './hooks/useOnlineStatus';
 import {
   Gamepad2,
   Sparkles,
@@ -50,8 +47,6 @@ import {
   Snowflake,
   ShieldCheck,
   X,
-  WifiOff,
-  Zap,
 } from 'lucide-react';
 
 export default function App() {
@@ -86,7 +81,6 @@ export default function App() {
   const [announcement, setAnnouncement] = useState<{ message: string; active: boolean }>({ message: '', active: false });
 
   const isVipUser = !!(currentUser?.isVip || currentUser?.isAdmin);
-  const isOnline = useOnlineStatus();
 
   const [filterState, setFilterState] = useState<FilterState>({
     searchQuery: '',
@@ -95,20 +89,6 @@ export default function App() {
     selectedTag: null,
     favoritesOnly: false,
   });
-
-  // Listen for iframe offline game selections
-  useEffect(() => {
-    const handleMsg = (e: MessageEvent) => {
-      if (e.data && e.data.action === 'SELECT_OFFLINE_GAME' && e.data.id) {
-        const target = games.find((g) => g.id === e.data.id || g.slug === e.data.id);
-        if (target) {
-          handleSelectGame(target);
-        }
-      }
-    };
-    window.addEventListener('message', handleMsg);
-    return () => window.removeEventListener('message', handleMsg);
-  }, [games]);
 
   // Initial Load & Panic Listener Setup
   useEffect(() => {
@@ -125,17 +105,6 @@ export default function App() {
     setFavoriteIds(getFavoriteIds());
     setRecentIds(getRecentlyPlayedIds());
     setAnnouncement(getSiteAnnouncement());
-
-    // Restore active game if refreshed or updated while playing
-    try {
-      const activeGameId = sessionStorage.getItem('gameland_active_game_id');
-      if (activeGameId) {
-        const target = loadedGames.find((g) => g.id === activeGameId || g.slug === activeGameId);
-        if (target) {
-          setSelectedGame(target);
-        }
-      }
-    } catch (e) {}
 
     // Apply custom tab title & favicon mask on mount
     const initialPanic = getPanicSettings();
@@ -236,9 +205,6 @@ export default function App() {
     trackGamePlay(game.id, game.title, game.category);
     const updatedCount = incrementPlayCount(game.id);
     const updatedGame = { ...game, playCount: updatedCount };
-    try {
-      sessionStorage.setItem('gameland_active_game_id', game.id);
-    } catch (e) {}
     setSelectedGame(updatedGame);
     setGames((prevGames) =>
       prevGames.map((g) => (g.id === game.id ? { ...g, playCount: updatedCount } : g))
@@ -289,16 +255,7 @@ export default function App() {
 
         // Category Filter
         if (filterState.category !== 'All') {
-          if (filterState.category === 'Offline') {
-            if (!game.isOfflineReady && game.embedType !== 'srcDoc') return false;
-          } else if (game.category !== filterState.category) {
-            return false;
-          }
-        }
-
-        // Offline Only filter
-        if (filterState.offlineOnly) {
-          if (!game.isOfflineReady && game.embedType !== 'srcDoc') return false;
+          if (game.category !== filterState.category) return false;
         }
 
         // Tag Filter
@@ -448,12 +405,7 @@ export default function App() {
               game={selectedGame}
               isFavorite={favoriteIds.includes(selectedGame.id)}
               onToggleFavorite={handleToggleFavorite}
-              onBack={() => {
-                try {
-                  sessionStorage.removeItem('gameland_active_game_id');
-                } catch (e) {}
-                setSelectedGame(null);
-              }}
+              onBack={() => setSelectedGame(null)}
               relatedGames={games.filter((g) => g.id !== selectedGame.id && g.category === selectedGame.category).slice(0, 4)}
               onSelectGame={handleSelectGame}
               favoriteIds={favoriteIds}
@@ -539,32 +491,14 @@ export default function App() {
                 <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 scrollbar-none">
                   <span className="text-xs text-slate-400 font-bold shrink-0">Tags:</span>
                   <button
-                    onClick={() => setFilterState((prev) => ({ ...prev, selectedTag: null, category: 'All' }))}
+                    onClick={() => setFilterState((prev) => ({ ...prev, selectedTag: null }))}
                     className={`px-2.5 py-1 rounded-lg text-xs font-semibold shrink-0 transition-all ${
-                      filterState.selectedTag === null && filterState.category !== 'Offline'
+                      filterState.selectedTag === null
                         ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
                         : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-slate-200'
                     }`}
                   >
                     All
-                  </button>
-                  <button
-                    onClick={() =>
-                      setFilterState((prev) => ({
-                        ...prev,
-                        category: prev.category === 'Offline' ? 'All' : 'Offline',
-                        selectedTag: null,
-                      }))
-                    }
-                    className={`px-2.5 py-1 rounded-lg text-xs font-bold shrink-0 flex items-center gap-1 transition-all ${
-                      filterState.category === 'Offline'
-                        ? 'bg-sky-500 text-slate-950 font-black shadow-md shadow-sky-500/20'
-                        : 'bg-sky-500/10 text-sky-300 border border-sky-400/30 hover:bg-sky-500/20'
-                    }`}
-                    title="Filter only 100% offline-ready games (no internet needed)"
-                  >
-                    <Zap className="w-3 h-3 text-sky-400 fill-sky-400" />
-                    <span>⚡ Offline Games</span>
                   </button>
                   {popularTags.map((tag) => (
                     <button
@@ -912,14 +846,6 @@ export default function App() {
           })
         }
       />
-
-      {/* Offline Connectivity Status Indicator Toast */}
-      <OfflineIndicator
-        onFilterOfflineGames={() => setFilterState((prev) => ({ ...prev, category: 'Offline' }))}
-      />
-
-      {/* Online Latest Game Version Update Toast */}
-      <PWAUpdateToast />
 
     </div>
   );

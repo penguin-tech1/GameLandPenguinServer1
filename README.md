@@ -38,18 +38,6 @@ A responsive, feature-packed online arcade and unblocked gaming portal hosted by
 - Interactive mascot Pebbles who tells jokes and reacts to your achievements!
 
 
-### 📴 100% Offline Playable (PWA)
-- **Zero Internet Required**: Built-in games like Snake, Tetris, 2048, Flappy Bird, Pong, Breakout, Fish Clicker, and more run 100% client-side with no network connection needed.
-- **Offline Accounts & Trophies**: Local credential authentication, high scores, trophies, and fish coins are fully persisted via browser storage offline.
-- **Progressive Web App (PWA)**: Install directly to desktop, Chromebook, iOS, or Android with a single click using the "Install App" button in the header. Full offline caching via Workbox Service Worker.
-
-### 🚀 GitHub Pages Deployment via GitHub Actions
-This repository is configured for automatic, zero-config deployment to **GitHub Pages** via GitHub Actions:
-1. In your GitHub repository, navigate to **Settings** → **Pages**.
-2. Under **Build and deployment** → **Source**, select **GitHub Actions**.
-3. Push changes to `main` or `master` (or click **Run workflow** in the **Actions** tab).
-4. The workflow in `.github/workflows/deploy.yml` will automatically build the PWA and deploy the static assets to GitHub Pages!
-
 If want more info contact me at both of my emails
 ishaan.yadav@franklinsabers.org 
 ishaany83@gmail.com

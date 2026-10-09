@@ -23,7 +23,6 @@ import {
   Sparkles,
   Crown,
   ShoppingBag,
-  WifiOff,
 } from 'lucide-react';
 import { CategoryType, FilterState } from '../types';
 import { UserAccount, getUserPoints } from '../utils/auth';
@@ -51,7 +50,6 @@ interface SidebarProps {
 
 const CATEGORY_ITEMS: { name: CategoryType; icon: React.ReactNode; color: string }[] = [
   { name: 'All', icon: <Compass className="w-4 h-4" />, color: 'text-cyan-400' },
-  { name: 'Offline', icon: <WifiOff className="w-4 h-4" />, color: 'text-sky-400' },
   { name: 'Proxies', icon: <Globe className="w-4 h-4" />, color: 'text-emerald-400' },
   { name: 'Action', icon: <Zap className="w-4 h-4" />, color: 'text-amber-400' },
   { name: 'Arcade', icon: <Gamepad className="w-4 h-4" />, color: 'text-emerald-400' },

@@ -303,32 +303,6 @@ app.post('/api/users/login', (req, res) => {
   });
 });
 
-// Live Version and Cache-Busting API
-app.get(['/version.json', '/api/version'], (req, res) => {
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-  res.setHeader('Pragma', 'no-cache');
-  res.setHeader('Expires', '0');
-  const versionFile = path.join(process.cwd(), 'public', 'version.json');
-  if (fs.existsSync(versionFile)) {
-    try {
-      const data = JSON.parse(fs.readFileSync(versionFile, 'utf-8'));
-      return res.json({
-        ...data,
-        serverTime: new Date().toISOString(),
-        serverOnline: true,
-      });
-    } catch (e) {
-      // Fallback
-    }
-  }
-  return res.json({
-    version: '2.1.0',
-    buildTime: new Date().toISOString(),
-    serverTime: new Date().toISOString(),
-    serverOnline: true,
-  });
-});
-
 // Bulk sync endpoint with password encryption
 app.post('/api/users/sync', (req, res) => {
   const { users, user } = req.body;

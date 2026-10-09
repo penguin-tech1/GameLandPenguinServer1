@@ -1,6 +1,5 @@
 export type CategoryType =
   | 'All'
-  | 'Offline'
   | 'Action'
   | 'Arcade'
   | 'Puzzle'
@@ -37,7 +36,6 @@ export interface Game {
   isVipExclusive?: boolean;
   vipLevel?: 'Gold' | 'Platinum' | 'Diamond';
   aspectRatio?: '16/9' | '4/3' | '1/1';
-  isOfflineReady?: boolean;
 }
 
 export interface FilterState {
@@ -46,7 +44,6 @@ export interface FilterState {
   sortBy: 'popular' | 'rating' | 'name' | 'newest';
   selectedTag: string | null;
   favoritesOnly: boolean;
-  offlineOnly?: boolean;
 }
 
 export type DisguiseType = 'google_docs' | 'wikipedia' | 'canvas_lms' | 'calculator';
