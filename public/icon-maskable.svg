@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="mbg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#020617"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="mcyanGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="mamberGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Full-bleed background for maskable icon -->
+  <rect width="512" height="512" fill="url(#mbg)"/>
+
+  <!-- Centered Scaled Content in Safe Zone (80% circle) -->
+  <g transform="translate(51.2, 51.2) scale(0.8)">
+    <!-- Arctic Ice Floor Base -->
+    <ellipse cx="256" cy="420" rx="160" ry="32" fill="#0ea5e9" opacity="0.3"/>
+
+    <!-- Penguin Body Outline & Shape -->
+    <ellipse cx="256" cy="270" rx="120" ry="145" fill="#090d16" stroke="#38bdf8" stroke-width="5"/>
+    <ellipse cx="256" cy="285" rx="80" ry="110" fill="#f8fafc"/>
+
+    <!-- Flippers -->
+    <ellipse cx="120" cy="280" rx="25" ry="65" fill="#090d16" stroke="#38bdf8" stroke-width="4" transform="rotate(25 120 280)"/>
+    <ellipse cx="392" cy="280" rx="25" ry="65" fill="#090d16" stroke="#38bdf8" stroke-width="4" transform="rotate(-25 392 280)"/>
+
+    <!-- Feet -->
+    <ellipse cx="205" cy="415" rx="36" ry="18" fill="url(#mamberGlow)" transform="rotate(-8 205 415)"/>
+    <ellipse cx="307" cy="415" rx="36" ry="18" fill="url(#mamberGlow)" transform="rotate(8 307 415)"/>
+
+    <!-- Eyes -->
+    <ellipse cx="215" cy="205" rx="24" ry="30" fill="#020617"/>
+    <ellipse cx="297" cy="205" rx="24" ry="30" fill="#020617"/>
+    <circle cx="208" cy="195" r="9" fill="#38bdf8"/>
+    <circle cx="290" cy="195" r="9" fill="#38bdf8"/>
+    <circle cx="222" cy="215" r="4" fill="#ffffff"/>
+    <circle cx="304" cy="215" r="4" fill="#ffffff"/>
+
+    <!-- Rosy Cheeks -->
+    <ellipse cx="178" cy="235" rx="14" ry="8" fill="#f43f5e" opacity="0.5"/>
+    <ellipse cx="334" cy="235" rx="14" ry="8" fill="#f43f5e" opacity="0.5"/>
+
+    <!-- Penguin Beak -->
+    <polygon points="256,215 236,242 276,242" fill="url(#mamberGlow)" stroke="#d97706" stroke-width="2"/>
+
+    <!-- Gaming Headset -->
+    <path d="M 170 185 A 90 90 0 0 1 342 185" fill="none" stroke="#06b6d4" stroke-width="14" stroke-linecap="round"/>
+    <rect x="150" y="165" width="24" height="48" rx="12" fill="#0284c7" stroke="#38bdf8" stroke-width="3"/>
+    <rect x="338" y="165" width="24" height="48" rx="12" fill="#0284c7" stroke="#38bdf8" stroke-width="3"/>
+    <path d="M 160 205 Q 165 255 220 252" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="225" cy="252" r="6" fill="#f43f5e"/>
+
+    <!-- Crown -->
+    <polygon points="228,110 242,125 256,102 270,125 284,110 278,135 234,135" fill="url(#mamberGlow)" stroke="#b45309" stroke-width="2"/>
+    <circle cx="256" cy="116" r="3" fill="#ffffff"/>
+
+    <!-- Controller -->
+    <rect x="206" y="318" width="100" height="52" rx="14" fill="#1e1b4b" stroke="#818cf8" stroke-width="3"/>
+    <rect x="222" y="336" width="18" height="6" rx="2" fill="#38bdf8"/>
+    <rect x="228" y="330" width="6" height="18" rx="2" fill="#38bdf8"/>
+    <circle cx="282" cy="336" r="4.5" fill="#ef4444"/>
+    <circle cx="292" cy="344" r="4.5" fill="#10b981"/>
+    <circle cx="272" cy="344" r="4.5" fill="#f59e0b"/>
+    <circle cx="282" cy="352" r="4.5" fill="#3b82f6"/>
+  </g>
+</svg>

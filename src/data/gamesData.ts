@@ -696,14 +696,19 @@ export function getAllGames(includeHidden = false): Game[] {
       const playCount = storedCounts[g.id] !== undefined ? storedCounts[g.id] : g.playCount;
       const gameOverride = overrides[g.id] || {};
       const baseGame = { ...g, ...gameOverride, playCount };
-      if (baseGame.embedType === 'srcDoc' || baseGame.embedUrl === 'about:blank') {
+      const builtInHtml = getBuiltInGameHtml(baseGame.slug) || getBuiltInGameHtml(baseGame.id);
+      if (baseGame.embedType === 'srcDoc' || baseGame.embedUrl === 'about:blank' || builtInHtml) {
         return {
           ...baseGame,
           embedType: 'srcDoc' as const,
-          srcDocContent: baseGame.srcDocContent || getBuiltInGameHtml(baseGame.slug) || getBuiltInGameHtml(baseGame.id),
+          srcDocContent: baseGame.srcDocContent || builtInHtml,
+          isOfflineReady: true,
         };
       }
-      return baseGame;
+      return {
+        ...baseGame,
+        isOfflineReady: false,
+      };
     });
 }
 

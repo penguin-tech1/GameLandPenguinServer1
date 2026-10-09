@@ -14,6 +14,10 @@ import {
   Trophy,
   Coins,
   MessageSquare,
+  WifiOff,
+  Zap,
+  Sparkles,
+  X,
 } from 'lucide-react';
 import { Game } from '../types';
 import { GameCard } from './GameCard';
@@ -23,6 +27,8 @@ import { LeaderboardSection } from './LeaderboardSection';
 import { GameFeedbackModal } from './GameFeedbackModal';
 import { UserAccount, getCurrentSessionUser } from '../utils/auth';
 import { recordGameLaunch, addPlaytimeMinutes } from '../utils/trophies';
+import { useOnlineStatus } from '../hooks/useOnlineStatus';
+import { usePWAUpdate } from '../hooks/usePWAUpdate';
 
 interface GamePlayerProps {
   game: Game;
@@ -55,6 +61,38 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const iframeContainerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const isOnline = useOnlineStatus();
+  const { isUpdateAvailable, isUpdating, applyUpdate, checkForUpdate, newVersionDetails } = usePWAUpdate();
+  const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
+
+  useEffect(() => {
+    if (isUpdateAvailable) {
+      setShowUpdatePrompt(true);
+    }
+  }, [isUpdateAvailable]);
+
+  // When internet reconnects while playing:
+  // 1. Instantly reload game iframe so latest assets/embeds are fetched
+  // 2. Trigger check for latest app & game update
+  useEffect(() => {
+    const handleOnline = () => {
+      console.log('🌐 Online connection restored during gameplay — checking for latest game version...');
+      setIsLoading(true);
+      setShowFocusBanner(true);
+      setKey((prev) => prev + 1);
+      checkForUpdate();
+    };
+
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, [checkForUpdate]);
+
+  const handleApplyUpdateFromPlayer = () => {
+    try {
+      sessionStorage.setItem('gameland_active_game_id', game.id);
+    } catch (e) {}
+    applyUpdate();
+  };
 
   const effectiveUser = currentUser || getCurrentSessionUser();
 
@@ -104,6 +142,9 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
     setIsLoading(true);
     setShowFocusBanner(true);
     setKey((prev) => prev + 1);
+    if (navigator.onLine) {
+      checkForUpdate();
+    }
   };
 
   const handleToggleFullscreen = () => {
@@ -141,13 +182,39 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
           <span>Back to Games</span>
         </button>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-300 font-bold border border-cyan-500/20">
             {game.category}
           </span>
           <h1 className="font-extrabold text-base sm:text-lg text-slate-100 line-clamp-1">
             {game.title}
           </h1>
+          {(game.isOfflineReady || game.embedType === 'srcDoc') && (
+            <span
+              className="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 font-black border border-sky-400/40 flex items-center gap-1 uppercase tracking-wider"
+              title="This game is built-in and runs completely offline with no internet needed"
+            >
+              <Zap className="w-3 h-3 text-sky-400 fill-sky-400" />
+              <span>Offline Ready</span>
+            </span>
+          )}
+          {isOnline ? (
+            <span
+              className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-extrabold border border-emerald-500/40 flex items-center gap-1 uppercase tracking-wider"
+              title="Connected to internet — automatically syncing with latest version"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Live • Latest</span>
+            </span>
+          ) : (
+            <span
+              className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-black border border-amber-500/40 flex items-center gap-1 uppercase tracking-wider animate-pulse"
+              title="You are currently playing offline"
+            >
+              <WifiOff className="w-3 h-3 text-amber-400" />
+              <span>Offline Mode</span>
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-2">
@@ -219,6 +286,49 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
         </div>
       </div>
 
+      {/* Latest Version Update Banner */}
+      {isUpdateAvailable && showUpdatePrompt && (
+        <aside
+          aria-label="Game update available"
+          className="w-full bg-gradient-to-r from-sky-950 via-slate-900 to-sky-950 border border-sky-400/60 rounded-2xl p-3 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-sky-100 shadow-xl shadow-sky-950/40 animate-slideDown ring-1 ring-sky-500/20"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-sky-300 shrink-0">
+              <Sparkles className="w-4 h-4 animate-spin text-sky-400" />
+            </div>
+            <div>
+              <p className="font-extrabold text-sky-200 flex items-center gap-1.5">
+                <span>Connected to Internet: Latest Game Version Ready!</span>
+                <span className="text-[10px] px-1.5 py-0.2 rounded bg-sky-400/20 text-sky-300 font-mono">
+                  {newVersionDetails?.version || 'v2.1'}
+                </span>
+              </p>
+              <p className="text-[11px] text-slate-300 mt-0.5">
+                A fresh update for "{game.title}" was published. Update now to play the latest version.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto">
+            <button
+              onClick={handleApplyUpdateFromPlayer}
+              disabled={isUpdating}
+              className="flex-1 sm:flex-initial px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-sky-400 to-cyan-400 hover:from-sky-300 hover:to-cyan-300 text-slate-950 font-black text-xs transition shadow-md flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50"
+            >
+              <RotateCw className={`w-3.5 h-3.5 ${isUpdating ? 'animate-spin' : ''}`} />
+              <span>{isUpdating ? 'Updating...' : 'Update Game Now'}</span>
+            </button>
+            <button
+              onClick={() => setShowUpdatePrompt(false)}
+              className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition"
+              title="Dismiss"
+              aria-label="Dismiss game update notification"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </aside>
+      )}
+
       {/* Main iFrame Player Container */}
       <div
         ref={iframeContainerRef}
@@ -254,7 +364,36 @@ export const GamePlayer: React.FC<GamePlayerProps> = ({
           </div>
         )}
 
-        {game.embedType === 'srcDoc' && game.srcDocContent ? (
+        {!isOnline && game.embedType !== 'srcDoc' && !game.srcDocContent ? (
+          <div className="absolute inset-0 bg-slate-950 p-6 flex flex-col items-center justify-center text-center z-10">
+            <div className="w-14 h-14 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 mb-3 shadow-lg shadow-amber-500/10 animate-bounce">
+              <WifiOff className="w-7 h-7" />
+            </div>
+            <h2 className="text-xl font-black text-white mb-1">Network Offline</h2>
+            <p className="text-xs text-slate-300 max-w-md mb-5 leading-relaxed">
+              "{game.title}" requires an active internet connection to stream external assets.
+              You can play any of GameLand's <strong className="text-sky-300">100% self-contained offline games</strong> right now with zero internet!
+            </p>
+            <div className="flex flex-wrap gap-2.5 justify-center max-w-md mb-6">
+              {relatedGames.filter(g => g.isOfflineReady || g.embedType === 'srcDoc').slice(0, 4).map(offGame => (
+                <button
+                  key={offGame.id}
+                  onClick={() => onSelectGame(offGame)}
+                  className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-sky-500/40 text-sky-300 text-xs font-bold flex items-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-md shadow-sky-950/40"
+                >
+                  <Zap className="w-3.5 h-3.5 text-sky-400 fill-sky-400" />
+                  <span>{offGame.title}</span>
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={handleReload}
+              className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition-colors"
+            >
+              Retry Connection
+            </button>
+          </div>
+        ) : game.embedType === 'srcDoc' && game.srcDocContent ? (
           <iframe
             ref={iframeRef}
             key={key}

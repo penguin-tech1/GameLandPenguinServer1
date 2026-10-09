@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Star, Heart, Flame, Eye, Sparkles, Crown, Lock } from 'lucide-react';
+import { Play, Star, Heart, Flame, Eye, Sparkles, Crown, Lock, Zap } from 'lucide-react';
 import { Game } from '../types';
 import { formatPlayCount } from '../data/gamesData';
 import { UserAccount, hasVipAccess } from '../utils/auth';
@@ -98,6 +98,15 @@ export const GameCard: React.FC<GameCardProps> = ({
             {game.rating >= 4.7 && !game.isVipExclusive && (
               <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-cyan-500 text-slate-950 flex items-center gap-1 shadow-md" title="Pebbles Pick">
                 <span>🐧 Pick</span>
+              </span>
+            )}
+            {(game.isOfflineReady || game.embedType === 'srcDoc') && (
+              <span
+                className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-sky-500/20 text-sky-300 border border-sky-400/40 backdrop-blur-md flex items-center gap-1"
+                title="Playable Offline - No internet connection needed"
+              >
+                <Zap className="w-2.5 h-2.5 text-sky-400 fill-sky-400" />
+                <span>Offline</span>
               </span>
             )}
           </div>
