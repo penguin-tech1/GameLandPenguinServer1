@@ -216,6 +216,8 @@
       { "key": "Space", "action": "Nitro / Brake" }
     ],
     "author": "Escape Road All-Stars",
+    "isNew": true,
+    "isVipExclusive": true
   },
   {
     "id": "geometry-dash-classic",
