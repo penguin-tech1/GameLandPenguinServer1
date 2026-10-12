@@ -361,6 +361,24 @@
     "isNew": true
   },
   {
+    "id": "retro-puck-94",
+    "title": "Retro Puck 94",
+    "slug": "retro-puck-94",
+    "category": "Sports",
+    "description": "Classic arcade hockey with fast puck battles, quick passes, and old-school rink action.",
+    "thumbnailUrl": "https://images.unsplash.com/photo-1547347298-4074fc3086f0?auto=format&fit=crop&q=80&w=600",
+    "embedUrl": "https://penguin-techhelp.github.io/RetroHockey/",
+    "embedType": "iframe",
+    "tags": ["sports", "hockey", "retro", "arcade", "puck"],
+    "rating": 4.7,
+    "playCount": 0,
+    "controls": [
+      { "key": "Mouse / Arrow Keys", "action": "Move & Shoot" }
+    ],
+    "author": "Penguin Tech Help",
+    "isNew": true
+  },
+  {
     "id": "basketballretro",
     "title": "Basketball Retro",
     "slug": "basketballretro",
