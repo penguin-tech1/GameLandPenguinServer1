@@ -236,6 +236,29 @@ app.get('/api/users', (req, res) => {
   res.json(serverUsersStore);
 });
 
+// Export users as CSV report with emails included
+app.get('/api/users/csv', (req, res) => {
+  const headers = ['Username', 'Email', 'Full Name', 'Role', 'VIP Status', 'VIP Tier', 'Points', 'Registered Date', 'Last Login'];
+  const escapeCsv = (val: any) => `"${String(val ?? '').replace(/"/g, '""')}"`;
+
+  const rows = Object.values(serverUsersStore).map((u: any) => [
+    escapeCsv(u.username),
+    escapeCsv(u.email || ''),
+    escapeCsv(u.name || ''),
+    escapeCsv(u.isAdmin ? 'Admin' : 'User'),
+    escapeCsv(u.isVip ? 'VIP' : 'Free'),
+    escapeCsv(u.vipLevel || 'None'),
+    escapeCsv(u.points ?? 0),
+    escapeCsv(u.createdAt || ''),
+    escapeCsv(u.lastLogin || '')
+  ].join(','));
+
+  const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\r\n');
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="gameland-users-${new Date().toISOString().slice(0, 10)}.csv"`);
+  res.send(csvContent);
+});
+
 // Single user registration endpoint with mandatory password encryption
 app.post('/api/users/register', (req, res) => {
   const { user, username, password, email, name, passwordHash } = req.body;

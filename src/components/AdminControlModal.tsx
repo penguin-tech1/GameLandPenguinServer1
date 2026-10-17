@@ -409,18 +409,51 @@ export const AdminControlModal: React.FC<AdminControlModalProps> = ({
 
   const handleExportUsersCsv = () => {
     const users = getAllUserRecords();
-    let csvContent = 'data:text/csv;charset=utf-8,Username,Role,VIP Status,VIP Tier,Points,Registered Date\n';
-    users.forEach((u) => {
-      csvContent += `"${u.username}","${u.isAdmin ? 'Admin' : 'User'}","${u.isVip ? 'VIP' : 'Free'}","${u.vipLevel || 'None'}",${u.points || 0},"${u.createdAt || ''}"\n`;
-    });
-    const encodedUri = encodeURI(csvContent);
+    const headers = [
+      'Username',
+      'Email',
+      'Full Name',
+      'Role',
+      'VIP Status',
+      'VIP Tier',
+      'Points',
+      'Login Streak',
+      'Registered Date',
+      'Last Login'
+    ];
+
+    const escapeCsv = (val: unknown) => {
+      if (val === null || val === undefined) return '""';
+      return `"${String(val).replace(/"/g, '""')}"`;
+    };
+
+    const rows = users.map((u) => [
+      escapeCsv(u.username),
+      escapeCsv(u.email || ''),
+      escapeCsv(u.name || ''),
+      escapeCsv(u.isAdmin ? 'Admin' : 'User'),
+      escapeCsv(u.isVip ? 'VIP' : 'Free'),
+      escapeCsv(u.vipLevel || 'None'),
+      escapeCsv(u.points ?? 0),
+      escapeCsv(u.loginStreak ?? 1),
+      escapeCsv(u.createdAt || ''),
+      escapeCsv(u.lastLogin || '')
+    ].join(','));
+
+    // Prepend UTF-8 BOM so spreadsheet apps (Excel, Google Sheets) parse encoding flawlessly
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
+    link.setAttribute('href', url);
     link.setAttribute('download', `gameland-users-${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    addAuditLog('system', 'Exported user accounts list to CSV');
+    URL.revokeObjectURL(url);
+    addAuditLog('system', 'Exported user accounts list (including emails) to CSV');
+    setUserMsg('Exported users CSV with email addresses!');
+    setTimeout(() => setUserMsg(''), 3000);
   };
 
   const handleExportFeedbackCsv = () => {
@@ -2579,13 +2612,25 @@ export const AdminControlModal: React.FC<AdminControlModalProps> = ({
                   </button>
                 </div>
 
-                <button
-                  onClick={() => setShowAddUserForm(!showAddUserForm)}
-                  className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-colors flex items-center justify-center gap-1.5 shadow-md shrink-0"
-                >
-                  <UserPlus className="w-4 h-4" />
-                  <span>{showAddUserForm ? 'Close Form' : 'Create User Account'}</span>
-                </button>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleExportUsersCsv}
+                    className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                    title="Download registered users CSV with email addresses"
+                  >
+                    <Download className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Export CSV</span>
+                  </button>
+
+                  <button
+                    onClick={() => setShowAddUserForm(!showAddUserForm)}
+                    className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold transition-colors flex items-center justify-center gap-1.5 shadow-md shrink-0 cursor-pointer"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    <span>{showAddUserForm ? 'Close Form' : 'Create User Account'}</span>
+                  </button>
+                </div>
               </div>
 
               {userMsg && (
@@ -3382,7 +3427,7 @@ export const AdminControlModal: React.FC<AdminControlModalProps> = ({
                         <span>User Accounts CSV</span>
                       </h5>
                       <p className="text-[11px] text-slate-400">
-                        Export user list with usernames, VIP status, points balances, and registered dates.
+                        Export user list with usernames, email addresses, roles, VIP status, points balances, and registered dates.
                       </p>
                     </div>
                     <button

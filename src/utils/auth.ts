@@ -1065,6 +1065,7 @@ export function getAllUserRecords(): (UserAccount & { passwordHash: string })[] 
     snacksInventory: record.snacksInventory || {},
     penguinHappiness: record.penguinHappiness ?? 85,
     penguinFeedCount: record.penguinFeedCount ?? 0,
+    points: record.points ?? 0,
   }));
 }
 
